@@ -1,5 +1,4 @@
-# Bu mini proje Ömer Bayar Tarafından Hazırlanmıştır.
-
+# Street Fighter Game
 from random import randint
 from os import system, name
 import time
