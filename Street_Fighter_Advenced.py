@@ -39,18 +39,18 @@ def get_translations(lang):
     translations = {
         "TR": {
             "coin_toss": "Yazı tura sonucu: {} önce başlar!",
-            "attack_prompt": "Saldırı türünü seçin (1-4): ",
+            "attack_prompt": "Saldırı türünü seçin (1-4) veya çıkmak için 'quit': ",
             "attack_types": "\n1. Hafif (10-20 hasar, 90% isabet)\n2. Orta (21-35 hasar, 70% isabet)\n3. Ağır (36-50 hasar, 50% isabet)\n4. İyileştir (20 HP, tek kullanımlık)",
-            "invalid_attack": "Lütfen 1, 2, 3 veya 4 seçin.",
-            "invalid_input": "Geçersiz giriş. Sayı girin.",
+            "invalid_attack": "Lütfen 1, 2, 3, 4 veya 'quit' girin.",
+            "invalid_input": "Geçersiz giriş. Sayı veya 'quit' girin.",
             "hit": "{} {} hasar verdi! {}",
             "miss": "HATA! {} saldırıyı kaçırdı!",
             "dodge": "{} saldırıyı savuşturdu!",
             "heal": "{} 20 HP iyileştirdi!",
             "heal_used": "{} zaten iyileştirme kullandı!",
             "win": "\n{0}#{0}\n{1} kazandı!!\n{0}#{0}",
-            "play_again": "Tekrar oyna? (Evet/Hayır): ",
-            "invalid_play_again": "Geçersiz giriş. Evet veya Hayır girin.",
+            "play_again": "Tekrar oyna? (Evet/Hayır) veya çıkmak için 'quit': ",
+            "invalid_play_again": "Geçersiz giriş. Evet, Hayır veya 'quit' girin.",
             "thanks": "Oynadığınız için teşekkürler! Görüşürüz!",
             "name_prompt": "Kahraman adı girin: ",
             "name_taken": "{} alındı, başka bir isim seçin!",
@@ -61,25 +61,26 @@ def get_translations(lang):
             "invalid_mode": "Lütfen 1 veya 2 seçin.",
             "difficulty_prompt": "Zorluk seçin (1: Kolay, 2: Normal, 3: Zor): ",
             "invalid_difficulty": "Lütfen 1, 2 veya 3 seçin.",
-            "save_prompt": "Oyunu kaydet? (Evet/Hayır): ",
+            "save_prompt": "Oyunu kaydet? (Evet/Hayır) veya çıkmak için 'quit': ",
             "load_prompt": "Kayıtlı oyunu yükle? (Evet/Hayır): ",
             "no_save": "Kayıtlı oyun bulunamadı!",
-            "leaderboard": "Lider Tablosu:\n{}: {} galibiyet, {} başarılı vuruş\n{}: {} galibiyet, {} başarılı vuruş"
+            "leaderboard": "Lider Tablosu:\n{}: {} galibiyet, {} başarılı vuruş\n{}: {} galibiyet, {} başarılı vuruş",
+            "quit_prompt": "Çıkmadan önce oyunu kaydetmek ister misiniz? (Evet/Hayır): "
         },
         "EN": {
             "coin_toss": "Coin toss result: {} starts first!",
-            "attack_prompt": "Choose attack type (1-4): ",
+            "attack_prompt": "Choose attack type (1-4) or 'quit' to exit: ",
             "attack_types": "\n1. Light (10-20 damage, 90% hit chance)\n2. Medium (21-35 damage, 70% hit chance)\n3. Heavy (36-50 damage, 50% hit chance)\n4. Heal (20 HP, one-time use)",
-            "invalid_attack": "Please select 1, 2, 3, or 4.",
-            "invalid_input": "Invalid input. Enter a number.",
+            "invalid_attack": "Please select 1, 2, 3, 4, or 'quit'.",
+            "invalid_input": "Invalid input. Enter a number or 'quit'.",
             "hit": "{} dealt {} damage! {}",
             "miss": "MISS! {} missed the attack!",
             "dodge": "{} dodged the attack!",
             "heal": "{} healed for 20 HP!",
             "heal_used": "{} already used their heal!",
             "win": "\n{0}#{0}\n{1} wins!!\n{0}#{0}",
-            "play_again": "Play again? (Yes/No): ",
-            "invalid_play_again": "Invalid input. Enter Yes or No.",
+            "play_again": "Play again? (Yes/No) or 'quit' to exit: ",
+            "invalid_play_again": "Invalid input. Enter Yes, No, or 'quit'.",
             "thanks": "Thanks for playing! See you next time!",
             "name_prompt": "Enter hero name: ",
             "name_taken": "{} is taken, choose another name!",
@@ -90,13 +91,20 @@ def get_translations(lang):
             "invalid_mode": "Please select 1 or 2.",
             "difficulty_prompt": "Select difficulty (1: Easy, 2: Normal, 3: Hard): ",
             "invalid_difficulty": "Please select 1, 2, or 3.",
-            "save_prompt": "Save game? (Yes/No): ",
+            "save_prompt": "Save game? (Yes/No) or 'quit' to exit: ",
             "load_prompt": "Load saved game? (Yes/No): ",
             "no_save": "No saved game found!",
-            "leaderboard": "Leaderboard:\n{}: {} wins, {} successful hits\n{}: {} wins, {} successful hits"
+            "leaderboard": "Leaderboard:\n{}: {} wins, {} successful hits\n{}: {} wins, {} successful hits",
+            "quit_prompt": "Save the game before quitting? (Yes/No): "
         }
     }
     return translations[lang]
+
+def clearConsole():
+    if name == "nt":
+        _ = system("cls")
+    else:
+        _ = system("clear")
 
 def display_ui(p1, p2, sira, lang, t):
     clearConsole()
@@ -116,7 +124,10 @@ def get_attack_choice(sira, lang, t, is_ai=False, difficulty="Normal"):
     print(t["attack_types"])
     while True:
         try:
-            choice = int(input(t["attack_prompt"]))
+            choice = input(t["attack_prompt"]).strip().lower()
+            if choice == "quit":
+                return "quit"
+            choice = int(choice)
             if choice in [1, 2, 3, 4]:
                 return choice
             print(t["invalid_attack"])
@@ -194,6 +205,17 @@ def load_game(saved_state):
     p2.hits = state["p2"]["hits"]
     return p1, p2, state["counter"], state["difficulty"], state["lang"]
 
+def handle_quit(p1, p2, counter, difficulty, lang, t):
+    while True:
+        save = input(t["quit_prompt"]).lower()
+        if save in ["evet", "hayır"] if lang == "TR" else ["yes", "no"]:
+            if save == ("evet" if lang == "TR" else "yes"):
+                saved_state = save_game(p1, p2, counter, difficulty, lang)
+                print("Oyun kaydedildi (JSON):\n", saved_state)
+            print(t["thanks"])
+            exit()
+        print(t["invalid_play_again"])
+
 def game(p1, p2, mode, difficulty, lang, t):
     counter = randint(0, 1)
     print(t["coin_toss"].format(p1.name if counter == 0 else p2.name))
@@ -204,6 +226,8 @@ def game(p1, p2, mode, difficulty, lang, t):
         display_ui(p1, p2, sira.name, lang, t)
         print(f"{Fore.YELLOW}———– {sira.name} Saldırıyor! ———–{Style.RESET_ALL}")
         choice = get_attack_choice(sira.name, lang, t, is_ai=(mode == "Single" and sira == p2), difficulty=difficulty)
+        if choice == "quit":
+            handle_quit(p1, p2, counter, difficulty, lang, t)
         damage, hit = perform_attack(sira, p1 if sira == p2 else p2, choice, counter, difficulty, lang, t)
         counter += 1
 
@@ -293,6 +317,8 @@ def main():
         print(t["leaderboard"].format(p1.name, p1.wins, p1.hits, p2.name, p2.wins, p2.hits))
         while True:
             save = input(t["save_prompt"]).lower()
+            if save == "quit":
+                handle_quit(p1, p2, counter, difficulty, lang, t)
             if save in ["evet", "hayır"] if lang == "TR" else ["yes", "no"]:
                 if save == ("evet" if lang == "TR" else "yes"):
                     saved_state = save_game(p1, p2, counter, difficulty, lang)
@@ -302,10 +328,11 @@ def main():
 
         while True:
             istek = input(t["play_again"]).lower()
+            if istek == "quit":
+                handle_quit(p1, p2, counter, difficulty, lang, t)
             if istek in ["evet", "hayır"] if lang == "TR" else ["yes", "no"]:
                 if istek == ("hayır" if lang == "TR" else "no"):
-                    print(t["thanks"])
-                    exit()
+                    handle_quit(p1, p2, counter, difficulty, lang, t)
                 p1.hp, p2.hp = p1.max_hp, p2.max_hp
                 p1.heal_used, p2.heal_used = False, False
                 break
