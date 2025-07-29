@@ -236,29 +236,11 @@ def main():
                     print(t["no_save"])
                     saved_state = None
 
+        # Oyuncu 1 (p1) oluşturma
         p1_name = input(t["name_prompt"]).strip()
         while not p1_name:
             print(t["name_empty"])
             p1_name = input(t["name_prompt"]).strip()
-
-        while True:
-            mode = input(t["mode_prompt"])
-            if mode in ["1", "2"]:
-                mode = "Two-Player" if mode == "1" else "Single"
-                break
-            print(t["invalid_mode"])
-
-        if mode == "Single":
-            p2_name = "AI_Opponent"
-            break
-        else:
-            while True:
-                p2_name = input(t["name_prompt"]).strip()
-                if not p2_name:
-                    print(t["name_empty"])
-                elif p1_name.lower() != p2_name.lower():
-                    break
-                print(t["name_taken"].format(p1_name))
 
         while True:
             class_choice = input(t["class_prompt"])
@@ -267,13 +249,33 @@ def main():
                 break
             print(t["invalid_class"])
 
+        # Oyun modu seçimi
         while True:
-            class_choice = input(t["class_prompt"])
-            if class_choice in ["1", "2", "3"]:
-                p2 = Player(p2_name, {1: "Savaşçı", 2: "Büyücü", 3: "Suikastçı"}[int(class_choice)])
+            mode = input(t["mode_prompt"])
+            if mode in ["1", "2"]:
+                mode = "Two-Player" if mode == "1" else "Single"
                 break
-            print(t["invalid_class"])
+            print(t["invalid_mode"])
 
+        # Oyuncu 2 (p2) oluşturma
+        if mode == "Single":
+            p2 = Player("AI_Opponent", "Savaşçı")  # AI için sabit sınıf
+        else:
+            while True:
+                p2_name = input(t["name_prompt"]).strip()
+                if not p2_name:
+                    print(t["name_empty"])
+                elif p1_name.lower() != p2_name.lower():
+                    break
+                print(t["name_taken"].format(p1_name))
+            while True:
+                class_choice = input(t["class_prompt"])
+                if class_choice in ["1", "2", "3"]:
+                    p2 = Player(p2_name, {1: "Savaşçı", 2: "Büyücü", 3: "Suikastçı"}[int(class_choice)])
+                    break
+                print(t["invalid_class"])
+
+        # Zorluk seçimi
         while True:
             diff = input(t["difficulty_prompt"])
             if diff in ["1", "2", "3"]:
